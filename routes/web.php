@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\MyPageController;
+use App\Http\Controllers\GachaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,6 +15,9 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// ガチャ結果を見るためのルート 後でユーザーがログインしたときだけアクセスできるようにする
+Route::get('/gacha', [GachaController::class, 'draw'])->name('gacha.draw');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -22,6 +26,7 @@ Route::middleware('auth')->group(function () {
     // マイページ
     Route::get('/mypage', [MyPageController::class, 'mypage'])->name('user.mypage');
 });
+
 
 // 管理ログイン画面
 Route::get('/admin-login', [AdminLoginController::class, 'create'])->name('admin.login');
