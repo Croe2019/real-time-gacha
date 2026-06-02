@@ -17,10 +17,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AdminSeeder::class);
         // User::factory(10)->create();
+        $this->call(GachaItemSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
     }
 }
