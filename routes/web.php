@@ -16,7 +16,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // ガチャ結果を見るためのルート 後でユーザーがログインしたときだけアクセスできるようにする
-Route::get('/gacha', [GachaController::class, 'draw'])->name('gacha.draw');
+Route::get('/gacha', [GachaController::class, 'index'])->name('gacha.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

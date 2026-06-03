@@ -34,7 +34,7 @@ class GachaPulled implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('gacha.' . $this->userID),
+            new PrivateChannel('gacha.' . $this->userId),
         ];
     }
 

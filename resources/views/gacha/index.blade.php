@@ -34,19 +34,14 @@
                         </div>
                         <div class="text-center">
                             <h4 :style="{color: getRarityColor(latestResult.rarity)}" class="fw-bold mb-3">
-                                
-                                @foreach($items as $item)
-                                    {{ $item->name }}
-                                @endforeach
+                                {{ latestResult.item_name }}
                             </h4>
                             <p class="mb-3">
                                 <span class="badge badge-lg" :style="{backgroundColor: getRarityColor(latestResult.rarity), padding: '10px 20px', fontSize: '1rem'}">
-                                    @foreach($items as $item)
-                                        {{ $item->rarity }}
-                                    @endforeach
+                                    {{ latestResult.rarity.toUpperCase() }}
                                 </span>
                             </p>
-                            
+                            <p class="text-muted">{{ latestResult.description }}</p>
                         </div>
                     </div>
                 </div>
@@ -59,6 +54,17 @@
         </div>
     </div>
 </div>
+
+<!-- Reverb設定を JavaScript オブジェクトとして埋め込む -->
+<script>
+    const reverbConfig = {
+        key: '{{ config('broadcasting.connections.reverb.key') }}',
+        host: '{{ config('broadcasting.connections.reverb.options.host') }}',
+        port: '{{ config('broadcasting.connections.reverb.options.port') }}',
+        scheme: '{{ config('broadcasting.connections.reverb.options.scheme') }}'
+    };
+</script>
+
 @endsection
 
 @push('scripts')
@@ -105,7 +111,7 @@
                     }
 
                     window.Echo.private(`gacha.${userId}`)
-                        .listen('GachaResultBroadcasted', (event) => {
+                        .listen('GachaPulled', (event) => {
                             console.log('Gacha result received:', event);
                             this.latestResult = event.result;
                             this.loading = false;

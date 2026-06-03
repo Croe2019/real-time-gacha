@@ -14,6 +14,11 @@ class GachaController extends Controller
         
     }
 
+    public function index()
+    {
+        return view('gacha.index');  // $items 不要
+    }
+
     // ここから再開 TODO
     public function draw(GachaService $gachaService)
     {
@@ -29,12 +34,12 @@ class GachaController extends Controller
 
         event(new GachaPulled($items, auth()->id()));
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'items' => $items,
-        //     'message' => 'ガチャ実行中'
-        // ]);
+        return response()->json([
+            'status' => 'success',
+            'items' => $items,
+            'message' => 'ガチャ実行中'
+        ]);
 
-        return view('gacha.index', ['items' => $items]);
+        //return view('gacha.index', ['items' => $items]);
     }
 }
