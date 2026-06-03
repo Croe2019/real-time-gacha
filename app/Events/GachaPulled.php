@@ -37,4 +37,9 @@ class GachaPulled implements ShouldBroadcast
             new Channel('gacha.' . $this->userID),
         ];
     }
+
+    public function broadcastAs(): string
+    {
+        return 'result';
+    }
 }

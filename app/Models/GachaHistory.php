@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\GachaItem;
+use App\Models\User;
 
 /**
  * @property int $id
@@ -26,4 +28,14 @@ class GachaHistory extends Model
 {
     protected $table = 'gacha_histories';
     protected $fillable = ['user_id', 'gacha_item_id', 'rarity'];
+
+    public function gachaItem()
+    {
+        return $this->belongsTo(GachaItem::class, 'gacha_item_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

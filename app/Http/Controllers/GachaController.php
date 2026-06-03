@@ -35,6 +35,6 @@ class GachaController extends Controller
         //     'message' => 'ガチャ実行中'
         // ]);
 
-        return view('gacha.draw', ['items' => $items]);
+        return view('gacha.index', ['items' => $items]);
     }
 }
