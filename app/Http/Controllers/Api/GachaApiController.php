@@ -35,12 +35,10 @@ class GachaApiController extends Controller
         $result = [
             'id' => $history->id,
             'item_name' => $item->name,
-            'item_image' => $item->image ?? 'https://via.placeholder.com/250',
-            'description' => $item->description ?? 'アイテムの説明',
             'rarity' => $item->rarity,
             'created_at' => $history->created_at,
 
-        ]
+        ];
 
         // イベントをディスパッチしてReverbでブロードキャスト
         GachaPulled::dispatch($result, auth()->id());

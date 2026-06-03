@@ -15,8 +15,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// ガチャ結果を見るためのルート 後でユーザーがログインしたときだけアクセスできるようにする
-Route::get('/gacha', [GachaController::class, 'index'])->name('gacha.index');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -25,6 +24,8 @@ Route::middleware('auth')->group(function () {
 
     // マイページ
     Route::get('/mypage', [MyPageController::class, 'mypage'])->name('user.mypage');
+    // ガチャ結果を見るためのルート 後でユーザーがログインしたときだけアクセスできるようにする
+    Route::get('/gacha', [GachaController::class, 'index'])->name('gacha.index');
 });
 
 
