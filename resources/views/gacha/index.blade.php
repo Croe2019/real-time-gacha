@@ -30,18 +30,15 @@
                 <div class="card-body p-4">
                     <div class="result-item">
                         <div class="text-center mb-3">
-                            <img :src="latestResult.item_image" :alt="latestResult.item_name" class="result-image">
+                            <img :src="'https://via.placeholder.com/250?text=' + encodeURIComponent(latestResult.item_name)" :alt="latestResult.item_name" class="result-image">
                         </div>
                         <div class="text-center">
-                            <h4 :style="{color: getRarityColor(latestResult.rarity)}" class="fw-bold mb-3">
-                                {{ latestResult.item_name }}
+                            <h4 :style="{color: getRarityColor(latestResult.rarity)}" class="fw-bold mb-3" v-text="latestResult.item_name">
                             </h4>
                             <p class="mb-3">
-                                <span class="badge badge-lg" :style="{backgroundColor: getRarityColor(latestResult.rarity), padding: '10px 20px', fontSize: '1rem'}">
-                                    {{ latestResult.rarity.toUpperCase() }}
+                                <span class="badge badge-lg" :style="{backgroundColor: getRarityColor(latestResult.rarity), padding: '10px 20px', fontSize: '1rem'}" v-text="latestResult.rarity">
                                 </span>
                             </p>
-                            <p class="text-muted">{{ latestResult.description }}</p>
                         </div>
                     </div>
                 </div>
@@ -90,11 +87,10 @@
                 latestResult: null,
                 loading: false,
                 rarityColorMap: {
-                    'legendary': '#FFD700',
-                    'epic': '#9932CC',
-                    'rare': '#4169E1',
-                    'uncommon': '#32CD32',
-                    'common': '#808080'
+                    '1': '#808080',
+                    '5': '#4169E1',
+                    '10': '#9932CC',
+                    '20': '#FFD700'
                 }
             };
         },
