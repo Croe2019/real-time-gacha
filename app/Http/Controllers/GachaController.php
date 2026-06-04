@@ -2,27 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\GachaPulled;
 use App\Models\GachaHistory;
-use Illuminate\Http\Request;
+
 use App\Services\GachaService;
 
 class GachaController extends Controller
 {
-    public function __invoke(GachaService $gachaService)
+    public function index()
     {
-        // $item = $gachaService->draw();
-        // GachaHistory::create([
-        //     'user_id' => auth()->id(),
-        //     'gacha_item_id' => $item->id,
-        //     'rarity' => $item->rarity,
-        // ]);
-
-        // return response()->json();
+        return view('gacha.index');
     }
 
     // ここから再開 TODO
-    public function draw(GachaService $gachaService)
+    public function draw()
     {
+        $gachaService = new GachaService();
         $items = $gachaService->draw();
 
         foreach($items as $item) {
@@ -31,11 +26,13 @@ class GachaController extends Controller
                 'gacha_item_id' => $item->id,
                 'rarity' => $item->rarity,
             ]);
+
+            event(new GachaPulled(auth()->id(), $item->name, $item->rarity));
         }
 
         return response()->json([
-            'status' => 'success',
-            'items' => $items,
+            'success' => true,
+            'results' => $items
         ]);
     }
 }

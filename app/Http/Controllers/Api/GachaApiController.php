@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\GachaHistory;
+use App\Models\GachaItem;
+use App\Events\GachaPulled;
 use Illuminate\Http\Request;
 use App\Services\GachaService;
 
@@ -24,13 +26,28 @@ class GachaApiController extends Controller
     public function store(Request $request, GachaService $gachaService)
     {
         $item = $gachaService->draw();
-        GachaHistory::create([
+        $history = GachaHistory::create([
             'user_id' => auth()->id(),
             'gacha_item_id' => $item->id,
             'rarity' => $item->rarity,
         ]);
 
-        return response()->json();
+        $result = [
+            'id' => $history->id,
+            'item_name' => $item->name,
+            'rarity' => $item->rarity,
+            'created_at' => $history->created_at,
+
+        ];
+
+        // イベントをディスパッチしてReverbでブロードキャスト
+        GachaPulled::dispatch($result, auth()->id());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'ガチャを実行しました',
+            'result' => $result
+        ]);
     }
 
     /**

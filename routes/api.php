@@ -8,7 +8,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/gacha/draw', [GachaApiController::class, 'index']);
     Route::post('/gacha/draw', [GachaApiController::class, 'store']);
 });
