@@ -1,151 +1,40 @@
-@extends('layouts.app')
 
-@section('content')
-    <div id="gacha-app" class="gacha-container" data-user-id="{{ auth()->id() }}">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <!-- ヘッダー -->
-                <div class="text-center mb-5">
-                    <h1 class="display-4 fw-bold">🎲 ガチャシミュレーター</h1>
-                </div>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-                <!-- ガチャ実行ボタン -->
-                <div class="text-center mb-5">
-                    <button
-                        @click="executeGacha"
-                        :disabled="loading"
-                        class="btn btn-primary btn-lg gacha-btn">
-                    <span v-if="!loading">
-                        ガチャを実行
-                    </span>
-                        <span v-else>
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        実行中...
-                    </span>
-                    </button>
-                </div>
+    <title>リアルタイムガチャ</title>
 
-                <!-- ガチャ結果表示 -->
-                <div v-if="results.length" class="card shadow-lg border-0 mb-4">
-                    <h2 class="h4 fw-bold text-center mb-4">ガチャ結果</h2>
-                    <div class="results-grid">
-                        <div v-for="result in results" :key="result.id" class="result-item text-center">
-                            <div class="mb-3">
-                                <img :src="'https://via.placeholder.com/250?text=' + encodeURIComponent(result.item_name)" :alt="result.item_name" class="result-image">
-                            </div>
-                            <h4 :style="{color: getRarityColor(result.rarity)}" class="fw-bold mb-3" v-text="result.item_name"></h4>
-                                <p class="mb-3">
-                                    <span class="badge badge-lg" :style="{backgroundColor: getRarityColor(result.rarity), padding: '10px 20px', fontSize: '1rem'}" v-text="result.rarity"></span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    @vite([
+        'resources/js/app.js',
+        'resources/js/gacha.js'
+    ])
+</head>
+<body>
 
-                <!-- 初期表示メッセージ -->
-                <div v-else-if="errorMessage" class="alert alert-danger text-center">
-                    <p class="mb-0" v-text="errorMessage"></p>
-                </div>
-                <div v-else class="alert alert-info text-center">
-                    <p class="mb-0">ガチャボタンを押してアイテムを獲得しよう！</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<h1>リアルタイムガチャ</h1>
 
-@endsection
+<button id="drawButton">
+    ガチャを引く
+</button>
 
-@push('scripts')
-    @vite('resources/js/gacha.js')
+<hr>
 
-@endpush
+<h2>最新結果</h2>
 
-@push('styles')
-    <style>
-        .gacha-container {
-            padding: 40px 20px;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+<div id="gachaResult">
+    未実行
+</div>
 
-        h1 {
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
+<hr>
 
-        .gacha-btn {
-            font-size: 1.2em;
-            padding: 15px 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            transition: all 0.3s ease;
-            font-weight: bold;
-        }
+<h2>リアルタイムログ</h2>
 
-        .gacha-btn:not(:disabled):hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
+<ul id="gachaLogs">
 
-        .gacha-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
+</ul>
 
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 24px;
-        }
-
-        .result-image {
-            width: 100%;
-            max-width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.6s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .badge-lg {
-            display: inline-block;
-            color: white;
-            font-weight: bold;
-        }
-
-        .card {
-            border-radius: 15px;
-            animation: cardSlideIn 0.6s ease-out;
-        }
-
-        @keyframes cardSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert {
-            border-radius: 15px;
-            padding: 30px;
-            font-size: 1.1rem;
-            background: rgba(255, 255, 255, 0.9);
-        }
-    </style>
-@endpush
+</body>
+</html>

@@ -25,7 +25,11 @@ Route::middleware('auth')->group(function () {
     // マイページ
     Route::get('/mypage', [MyPageController::class, 'mypage'])->name('user.mypage');
     // ガチャ結果を見るためのルート 後でユーザーがログインしたときだけアクセスできるようにする
-    Route::get('/gacha', [GachaController::class, 'index'])->name('gacha.index');
+    Route::get('/gacha/draw', [GachaController::class, 'index'])->name('gacha.index');
+    Route::post('/gacha/draw', [
+        GachaController::class,
+        'draw'
+    ]);
 });
 
 

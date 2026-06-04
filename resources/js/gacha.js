@@ -1,60 +1,55 @@
-import axios from 'axios';
-import { createApp } from 'vue';
-import './Echo';
+const drawButton = document.getElementById('drawButton');
 
-createApp({
-    data() {
-        return {
-            results: [],
-            loading: false,
-            errorMessage: '',
-            rarityColorMap: {
-                1: '#808080',
-                5: '#4169E1',
-                10: '#9932CC',
-                20: '#FFD700',
-            },
-        };
-    },
-    mounted() {
-        this.subscribeToGachaChannel();
-    },
-    methods: {
-        subscribeToGachaChannel() {
-            const userId = document.getElementById('gacha-app')?.dataset.userId;
+drawButton.addEventListener('click', async () => {
 
-            if (!userId || !window.Echo) {
-                return;
+    try {
+
+        const response = await fetch('/gacha/draw', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN':
+                document.querySelector(
+                    'meta[name="csrf-token"]'
+                ).content
             }
+        });
 
-            window.Echo.private(`gacha.${userId}`)
-                .listen('.result', (event) => {
-                    this.results = event.results ?? [];
-                    this.loading = false;
-                    this.errorMessage = '';
-                })
-                .error((error) => {
-                    console.error('Echo error:', error);
-                });
-        },
-        executeGacha() {
-            this.loading = true;
-            this.errorMessage = '';
+        console.log(await response.text());
 
-            axios.post('/api/gacha/draw')
-                .then((response) => {
-                    this.results = response.data.results ?? [];
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    this.errorMessage = 'ガチャの実行に失敗しました';
-                })
-                .finally(() => {
-                    this.loading = false;
-                });
-        },
-        getRarityColor(rarity) {
-            return this.rarityColorMap[rarity] || '#808080';
-        },
-    },
-}).mount('#gacha-app');
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+});
+
+
+window.Echo
+    .channel('gacha.dashboard')
+    .listen('.gacha.pulled', (event) => {
+
+        const resultArea =
+            document.getElementById('gachaResult');
+
+        resultArea.innerHTML =
+            `
+${event.item_name}
+(${event.rarity})
+`;
+
+        const log =
+            document.createElement('li');
+
+        log.innerHTML =
+            `[${event.timestamp}]
+${event.item_name}
+(${event.rarity})`;
+
+        document
+            .getElementById('gachaLogs')
+            .prepend(log);
+
+        console.log(event);
+
+    });
