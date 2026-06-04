@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        $middleware->statefulApi();
+
         $middleware->redirectGuestsTo(function(Request $request) {
             if (request()->routeIs('admin.*')) {
                 return $request->expectsJson() ? null : route('admin.top');

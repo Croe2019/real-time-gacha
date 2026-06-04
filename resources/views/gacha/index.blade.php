@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div id="gacha-app" class="gacha-container">
+    <div id="gacha-app" class="gacha-container" data-user-id="{{ auth()->id() }}">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <!-- ヘッダー -->
@@ -26,18 +26,16 @@
                 </div>
 
                 <!-- ガチャ結果表示 -->
-                <div v-if="latestResult" class="card shadow-lg border-0 mb-4">
-                    <div class="card-body p-4">
-                        <div class="result-item">
-                            <div class="text-center mb-3">
-                                <img :src="'https://via.placeholder.com/250?text=' + encodeURIComponent(latestResult.item_name)" :alt="latestResult.item_name" class="result-image">
+                <div v-if="results.length" class="card shadow-lg border-0 mb-4">
+                    <h2 class="h4 fw-bold text-center mb-4">ガチャ結果</h2>
+                    <div class="results-grid">
+                        <div v-for="result in results" :key="result.id" class="result-item text-center">
+                            <div class="mb-3">
+                                <img :src="'https://via.placeholder.com/250?text=' + encodeURIComponent(result.item_name)" :alt="result.item_name" class="result-image">
                             </div>
-                            <div class="text-center">
-                                <h4 :style="{color: getRarityColor(latestResult.rarity)}" class="fw-bold mb-3" v-text="latestResult.item_name">
-                                </h4>
+                            <h4 :style="{color: getRarityColor(result.rarity)}" class="fw-bold mb-3" v-text="result.item_name"></h4>
                                 <p class="mb-3">
-                                <span class="badge badge-lg" :style="{backgroundColor: getRarityColor(latestResult.rarity), padding: '10px 20px', fontSize: '1rem'}" v-text="latestResult.rarity">
-                                </span>
+                                    <span class="badge badge-lg" :style="{backgroundColor: getRarityColor(result.rarity), padding: '10px 20px', fontSize: '1rem'}" v-text="result.rarity"></span>
                                 </p>
                             </div>
                         </div>
@@ -45,6 +43,9 @@
                 </div>
 
                 <!-- 初期表示メッセージ -->
+                <div v-else-if="errorMessage" class="alert alert-danger text-center">
+                    <p class="mb-0" v-text="errorMessage"></p>
+                </div>
                 <div v-else class="alert alert-info text-center">
                     <p class="mb-0">ガチャボタンを押してアイテムを獲得しよう！</p>
                 </div>
@@ -52,98 +53,11 @@
         </div>
     </div>
 
-    <!-- Reverb設定を JavaScript オブジェクトとして埋め込む -->
-    <script>
-        const reverbConfig = {
-            key: '{{ config('broadcasting.connections.reverb.key') }}',
-            host: '{{ config('broadcasting.connections.reverb.options.host') }}',
-            port: '{{ config('broadcasting.connections.reverb.options.port') }}',
-            scheme: '{{ config('broadcasting.connections.reverb.options.scheme') }}'
-        };
-    </script>
-
 @endsection
 
 @push('scripts')
-    <!-- Pusher & Echo ライブラリの読み込み -->
-    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.0/dist/echo.iife.js"></script>
+    @vite('resources/js/gacha.js')
 
-    <script>
-        // Echo設定
-        window.Echo = new Echo({
-            broadcaster: 'reverb',
-            key: reverbConfig.key,
-            wsHost: reverbConfig.host,
-            wsPort: reverbConfig.port,
-            wssPort: reverbConfig.port,
-            forceTLS: reverbConfig.scheme === 'https',
-            enabledTransports: ['ws', 'wss']
-        });
-
-        const app = Vue.createApp({
-            data() {
-                return {
-                    latestResult: null,
-                    loading: false,
-                    rarityColorMap: {
-                        '1': '#808080',
-                        '5': '#4169E1',
-                        '10': '#9932CC',
-                        '20': '#FFD700'
-                    }
-                };
-            },
-            mounted() {
-                this.subscribeToGachaChannel();
-            },
-            methods: {
-                subscribeToGachaChannel() {
-                    try {
-                        const userId = {{ auth()->id() ?? 'null' }};
-                        if (!userId) {
-                            console.warn('User not authenticated');
-                            return;
-                        }
-
-                        window.Echo.private(`gacha.${userId}`)
-                            .listen('GachaPulled', (event) => {
-                                console.log('Gacha result received:', event);
-                                this.latestResult = event.result;
-                                this.loading = false;
-                            })
-                            .error((error) => {
-                                console.error('Echo error:', error);
-                            });
-                    } catch (error) {
-                        console.error('Failed to subscribe to channel:', error);
-                    }
-                },
-                executeGacha() {
-                    this.loading = true;
-
-                    axios.post('/api/gacha/draw', {}, {
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
-                        }
-                    })
-                        .then(response => {
-                            console.log('Gacha spin executed:', response.data);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            this.loading = false;
-                            alert('ガチャの実行に失敗しました');
-                        });
-                },
-                getRarityColor(rarity) {
-                    return this.rarityColorMap[rarity] || '#808080';
-                }
-            }
-        });
-
-        app.mount('#gacha-app');
-    </script>
 @endpush
 
 @push('styles')
@@ -178,9 +92,16 @@
             cursor: not-allowed;
         }
 
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+        }
+
         .result-image {
-            width: 250px;
-            height: 250px;
+            width: 100%;
+            max-width: 180px;
+            height: 180px;
             object-fit: cover;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);

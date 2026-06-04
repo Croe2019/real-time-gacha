@@ -4,10 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\GachaItem;
-use App\Models\GachaHistory;
-use App\Services\GachaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class GachaApiTest extends TestCase
@@ -51,9 +48,11 @@ class GachaApiTest extends TestCase
         $this->actingAs($user, 'sanctum');
         $response = $this->postJson('api/gacha/draw');
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonCount(10, 'results');
 
-        //dd(GachaHistory::all()->toArray());
+        $this->assertDatabaseCount('gacha_histories', 10);
         $this->assertDatabaseHas('gacha_histories', [
             'user_id' => $user->id,
         ]);
