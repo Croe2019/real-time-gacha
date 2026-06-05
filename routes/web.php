@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\MyPageController;
 use App\Http\Controllers\GachaController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +46,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/admin', function () {
         return view('admin.top');
     })->name('admin.top');
+
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 
 require __DIR__.'/auth.php';
