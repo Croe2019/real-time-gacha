@@ -47,7 +47,7 @@ Route::middleware('auth:admin')->group(function () {
         return view('admin.top');
     })->name('admin.top');
 
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    //Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 
 require __DIR__.'/auth.php';

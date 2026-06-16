@@ -25,6 +25,7 @@ class GachaApiController extends Controller
      */
     public function store(Request $request, GachaService $gachaService)
     {
+
         $item = $gachaService->draw();
         $history = GachaHistory::create([
             'user_id' => auth()->id(),
@@ -72,5 +73,15 @@ class GachaApiController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+
+    public function loadTest(GachaService $gachaService)
+    {
+        $item = $gachaService->draw();
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }
