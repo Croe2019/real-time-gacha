@@ -12,3 +12,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/gacha/draw', [GachaApiController::class, 'index']);
     Route::post('/gacha/draw', [GachaApiController::class, 'store']);
 });
+
+// 負荷試験専用
+Route::post(
+    '/gacha/load-test',
+    [GachaApiController::class, 'loadTest']
+);
